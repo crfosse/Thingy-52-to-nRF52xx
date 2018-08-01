@@ -30,12 +30,30 @@ In order to try this out yourself:
 1. replace the `main.c` file in you ble_app_blinky_c example in with the 'main.c' from this repo. In the function `tes_c_evt_handler` you can choose which sensors you want to receive data from. Just call the respective sensor's `ble_tes_c_<sensor type>_notif_enable` function. 
 2. Move the folders in src to `<Your SDK path>\components\ble\ble_services\`. The folder `ble_tes_c` includes the Thingy Enviroment service files and the `ble_lbs_c` folder includes the original LED button service code amended for use with the Thingy(as described earlier).
 4. Remember to include the path to the `ble_tes_c` folder in your project. 
+5. Add the new `sdk_config.h` from the `config` folder to your project. Alternatively look at "Note 3". 
 5. Build and flash it to you nrf52 DK. 
 
 Note 1: It is possible to get config data from the Thingy, but I haven't looked into how that works. Use on your own risk. 
 
 Note 2: CO2 data from the Thingy is as of now not working. But I'm trying to find out how to get it. 
 
-Note 3: This is only tested with and nRF52832 DK. Some amendments may be necessary for use with the nRF52840. 
+Note 3: The neccessary defines to add in the `sdk_config` are: 
+```
+// <q> BLE_TES_C_ENABLED  - ble_tes_c - Nordic Thingy Enviroment Service Client
+
+#ifndef BLE_TES_C_ENABLED
+#define BLE_TES_C_ENABLED 1
+#endif
+
+// <o> BLE_TES_C_BLE_OBSERVER_PRIO  
+// <i> Priority with which BLE events are dispatched to the Thingy Enviroment Service Client.
+
+#ifndef BLE_TES_C_BLE_OBSERVER_PRIO
+#define BLE_TES_C_BLE_OBSERVER_PRIO 2
+#endif
+
+```
+
+Note 4: This is only tested with and nRF52832 DK. Some amendments may be necessary for use with the nRF52840. 
 
 Good luck!
