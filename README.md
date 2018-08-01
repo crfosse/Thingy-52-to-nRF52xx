@@ -54,6 +54,6 @@ Note 3: The necessary defines to add in the `sdk_config` are:
 
 ```
 
-Note 4: This is only tested with and nRF52832 DK. Some amendments may be necessary for use with the nRF52840. 
+Note 4: This is only tested with a nRF52832 DK. Some amendments may be necessary for use with the nRF52840. 
 
 Good luck!
