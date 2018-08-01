@@ -11,7 +11,7 @@ For this example I have used:
 
 Programming of the Thingy is not required at all.
 
-The code takes base in the ble_app_blinky_c example found in the SDK. This uses the BLE LED button service to demonstrate how two DKs can toggle each other's LEDs through transmitting button state. The first iteration of this project was to enable our DK's LEDS to be toggled by a Thingy button press. This can be done in two steps:
+The code takes base in the `ble_app_blinky_c` example found in the SDK. This uses the BLE LED button service to demonstrate how two DKs can toggle each other's LEDs through transmitting button state. The first iteration of this project was to enable our DK's LEDS to be toggled by a Thingy button press. This can be done in two steps:
 
 1. In main: change the `m_target_periph_name[]` to your Thingy's name(i.e. `"Thingy"`).
 2. In ble_lbs_c.h: replace the LBS_UUID values with the corrosponding ones for the Thingy: 
@@ -28,17 +28,14 @@ Achieving access to all the enviroment sensor data from the Thingy requires more
 
 In order to try this out yourself:
 1. replace the `main.c` file in you ble_app_blinky_c example in with the 'main.c' from this repo. In the function `tes_c_evt_handler` you can choose which sensors you want to receive data from. Just call the respective sensor's `ble_tes_c_<sensor type>_notif_enable` function. 
-2. Create a the folder `ble_tes_c` in `<Your SDK path>\components\ble\ble_services\`.
-3. Put the files `ble_tes_c.c` and `ble_tes_c.h` in the ble_tes_folder.
+2. Move the folders in src to `<Your SDK path>\components\ble\ble_services\`. The folder `ble_tes_c` includes the Thingy Enviroment service files and the `ble_lbs_c` folder includes the original LED button service code amended for use with the Thingy(as described earlier).
 4. Remember to include the path to the `ble_tes_c` folder in your project. 
 5. Build and flash it to you nrf52 DK. 
 
-Note 1: If you want the LBS functionality just to as described earlier OR add the files `ble_lbs_c.c` and `ble_lbs_c.h` from this repo to the `ble_lbs_c` folder(which is located where you created your `ble_tes_c` folder).
+Note 1: It is possible to get config data from the Thingy, but I haven't looked into how that works. Use on your own risk. 
 
-Note 2: It is possible to get config data from the Thingy, but I haven't looked into how that works. Use on your own risk. 
+Note 2: CO2 data from the Thingy is as of now not working. But I'm trying to find out how to get it. 
 
-Note 3: C02 data from the Thingy is as of now not working. But I'm trying to find out how to get it. 
-
-Note 2: This is only tested with and nRF52832 DK. Some amendments may be necessary for use with the nRF52840. 
+Note 3: This is only tested with and nRF52832 DK. Some amendments may be necessary for use with the nRF52840. 
 
 Good luck!
