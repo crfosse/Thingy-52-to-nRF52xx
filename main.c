@@ -38,9 +38,9 @@
  * 
  */
 /**
- * @brief BLE LED Button Service central and client application main file.
+ * @brief Environment sensor data and button press from Thingy:52 to nRf52xx DK application main file.
  *
- * This file contains the source code for a sample client application using the LED Button service.
+ * This file contains the source code for a sample client application using the LED Button service and the Thingy Environment service.
  */
 
 #include <stdint.h>
@@ -211,7 +211,7 @@ static void lbs_c_evt_handler(ble_lbs_c_t * p_lbs_c, ble_lbs_c_evt_t * p_lbs_c_e
     }
 }
 
-/**@brief Handles events coming from the Thingy Enviroment central module.
+/**@brief Handles events coming from the Thingy Environment central module.
  */
 static void tes_c_evt_handler(ble_tes_c_t * p_tes_c, ble_tes_c_evt_t * p_tes_c_evt)
 {
@@ -224,9 +224,9 @@ static void tes_c_evt_handler(ble_tes_c_t * p_tes_c, ble_tes_c_evt_t * p_tes_c_e
             err_code = ble_tes_c_handles_assign(&m_ble_tes_c,
                                                 p_tes_c_evt->conn_handle,
                                                 &p_tes_c_evt->params.peer_db);
-            NRF_LOG_INFO("Thingy Enviroment service discovered on conn_handle 0x%x.", p_tes_c_evt->conn_handle);
+            NRF_LOG_INFO("Thingy Environment service discovered on conn_handle 0x%x.", p_tes_c_evt->conn_handle);
 
-            // Thingy Enviroment service discovered. Enable notification of Temperature.
+            // Thingy Environment service discovered. Enable notification of sensor data.
             err_code = ble_tes_c_temperature_notif_enable(p_tes_c);
             APP_ERROR_CHECK(err_code);
             err_code = ble_tes_c_pressure_notif_enable(p_tes_c);
@@ -414,7 +414,7 @@ static void lbs_c_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
-/**@brief Thingy Enviroment client initialization.
+/**@brief Thingy Environment client initialization.
  */
 static void tes_c_init(void)
 {

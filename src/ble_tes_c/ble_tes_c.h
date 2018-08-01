@@ -39,15 +39,14 @@
  */
 /**@file
  *
- * @defgroup ble_tes_c Thingy Enviroment Service Client
+ * @defgroup ble_tes_c Thingy Environment Service Client
  * @{
  * @ingroup  ble_sdk_srv
- * @brief    The Thingy Enviroment Service client can be used to set a LED, and read a button state on a
- *           Thingy Enviroment service server.
+ * @brief    The Thingy Environment Service client can be used to read environment sensor data from the Nordic Thingy:52.
  *
- * @details  This module contains the APIs and types exposed by the Thingy Enviroment Service Client
+ * @details  This module contains the APIs and types exposed by the Thingy Environment Service Client
  *           module. These APIs and types can be used by the application to perform discovery of
- *           Thingy Enviroment Service at the peer and interact with it.
+ *           Thingy Environment Service at the peer and interact with it.
  *
  * @note    The application must register this module as BLE event observer using the
  *          NRF_SDH_BLE_OBSERVER macro. Example:
@@ -128,7 +127,7 @@ typedef struct
 } ble_config_t; 
 
 
-/**@brief Structure containing the handles related to the Thingy Enviroment Service found on the peer. */
+/**@brief Structure containing the handles related to the Thingy Environment Service found on the peer. */
 typedef struct
 {
     uint16_t temperature_cccd_handle;       /**< Handle of the CCCD of the <...> characteristic. */
@@ -167,30 +166,30 @@ typedef struct ble_tes_c_s ble_tes_c_t;
  */
 typedef void (* ble_tes_c_evt_handler_t) (ble_tes_c_t * p_ble_tes_c, ble_tes_c_evt_t * p_evt);
 
-/**@brief Thingy Enviroment Client structure. */
+/**@brief Thingy Environment Client structure. */
 struct ble_tes_c_s
 {
     uint16_t                conn_handle;  /**< Connection handle as provided by the SoftDevice. */
     tes_db_t                peer_tes_db;  /**< Handles related to tes on the peer*/
-    ble_tes_c_evt_handler_t evt_handler;  /**< Application event handler to be called when there is an event related to the Thingy Enviroment service. */
+    ble_tes_c_evt_handler_t evt_handler;  /**< Application event handler to be called when there is an event related to the Thingy Environment service. */
     uint8_t                 uuid_type;    /**< UUID type. */
 };
 
-/**@brief Thingy Enviroment Client initialization structure. */
+/**@brief Thingy Environment Client initialization structure. */
 typedef struct
 {
-    ble_tes_c_evt_handler_t evt_handler;  /**< Event handler to be called by the Thingy Enviroment Client module whenever there is an event related to the Thingy Enviroment Service. */
+    ble_tes_c_evt_handler_t evt_handler;  /**< Event handler to be called by the Thingy Environment Client module whenever there is an event related to the Thingy Environment Service. */
 } ble_tes_c_init_t;
 
 
-/**@brief Function for initializing the Thingy Enviroment client module.
+/**@brief Function for initializing the Thingy Environment client module.
  *
  * @details This function will register with the DB Discovery module. There it registers for the
- *          Thingy Enviroment Service. Doing so will make the DB Discovery module look for the presence
- *          of a Thingy Enviroment Service instance at the peer when a discovery is started.
+ *          Thingy Environment Service. Doing so will make the DB Discovery module look for the presence
+ *          of a Thingy Environment Service instance at the peer when a discovery is started.
  *
- * @param[in] p_ble_tes_c      Pointer to the Thingy Enviroment client structure.
- * @param[in] p_ble_tes_c_init Pointer to the Thingy Enviroment initialization structure containing the
+ * @param[in] p_ble_tes_c      Pointer to the Thingy Environment client structure.
+ * @param[in] p_ble_tes_c_init Pointer to the Thingy Environment initialization structure containing the
  *                             initialization information.
  *
  * @retval    NRF_SUCCESS On successful initialization. Otherwise an error code. This function
@@ -203,22 +202,21 @@ uint32_t ble_tes_c_init(ble_tes_c_t * p_ble_tes_c, ble_tes_c_init_t * p_ble_tes_
 /**@brief Function for handling BLE events from the SoftDevice.
  *
  * @details This function will handle the BLE events received from the SoftDevice. If a BLE event
- *          is relevant to the Thingy Enviroment Client module, then it uses it to update interval
+ *          is relevant to the Thingy Environment Client module, then it uses it to update interval
  *          variables and, if necessary, send events to the application.
  *
  * @param[in] p_ble_evt     Pointer to the BLE event.
- * @param[in] p_context     Pointer to the Thingy Enviroment client structure.
+ * @param[in] p_context     Pointer to the Thingy Environment client structure.
  */
 void ble_tes_c_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_context);
 
 
-/**@brief Function for requesting the peer to start sending notification of the different characteristics
- *        Characteristic.
+/**@brief Function for requesting the peer to start sending notification of the different characteristics.
  *
  * @details This function will enable to notification of the characteristic at the peer
- *          by writing to the CCCD of the temperature Characteristic.
+ *          by writing to the CCCD of the respective Characteristic.
  *
- * @param[in] p_ble_tes_c Pointer to the Thingy Enviroment Client structure.
+ * @param[in] p_ble_tes_c Pointer to the Thingy Environment Client structure.
  *
  * @retval  NRF_SUCCESS If the SoftDevice has been requested to write to the CCCD of the peer.
  *                      Otherwise, an error code. This function propagates the error code returned
@@ -237,12 +235,12 @@ uint32_t ble_tes_c_config_notif_enable(ble_tes_c_t * p_ble_tes_c);
  *
  * @details Call this function when getting a callback event from the DB discovery module. This
  *          function will handle an event from the database discovery module, and determine if it
- *          relates to the discovery of Thingy Enviroment service at the peer. If so, it will call the
- *          application's event handler indicating that the Thingy Enviroment service has been discovered
+ *          relates to the discovery of Thingy Environment service at the peer. If so, it will call the
+ *          application's event handler indicating that the Thingy Environment service has been discovered
  *          at the peer. It also populates the event with the service related information before
  *          providing it to the application.
  *
- * @param[in] p_ble_tes_c Pointer to the Thingy Enviroment client structure.
+ * @param[in] p_ble_tes_c Pointer to the Thingy Environment client structure.
  * @param[in] p_evt Pointer to the event received from the database discovery module.
  */
 void ble_tes_on_db_disc_evt(ble_tes_c_t * p_ble_tes_c, const ble_db_discovery_evt_t * p_evt);
@@ -254,9 +252,9 @@ void ble_tes_on_db_disc_evt(ble_tes_c_t * p_ble_tes_c, const ble_db_discovery_ev
  *          to this instance of the module. This makes it  possible to handle several links and
  *          associate each link to a particular instance of this module.
  *
- * @param[in] p_ble_tes_c    Pointer to the Thingy Enviroment client structure instance to associate.
- * @param[in] conn_handle    Connection handle to associate with the given Thingy Enviroment Client Instance.
- * @param[in] p_peer_handles Thingy Enviroment Service handles found on the peer (from @ref BLE_tes_C_EVT_DISCOVERY_COMPLETE event).
+ * @param[in] p_ble_tes_c    Pointer to the Thingy Environment client structure instance to associate.
+ * @param[in] conn_handle    Connection handle to associate with the given Thingy Environment Client Instance.
+ * @param[in] p_peer_handles Thingy Environment Service handles found on the peer (from @ref BLE_tes_C_EVT_DISCOVERY_COMPLETE event).
  *
  */
 uint32_t ble_tes_c_handles_assign(ble_tes_c_t *    p_ble_tes_c,

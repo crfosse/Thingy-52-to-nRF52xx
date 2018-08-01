@@ -369,7 +369,7 @@
 #define BLE_LBS_C_ENABLED 1
 #endif
 
-// <q> BLE_TES_C_ENABLED  - ble_tes_c - Nordic Thingy Enviroment Service Client
+// <q> BLE_TES_C_ENABLED  - ble_tes_c - Nordic Thingy Environment Service Client
  
 
 #ifndef BLE_TES_C_ENABLED
@@ -11636,14 +11636,14 @@
 #endif
 
 // <o> BLE_TES_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Thingy Enviroment Service.
+// <i> Priority with which BLE events are dispatched to the Thingy Environment Service.
 
 #ifndef BLE_TES_BLE_OBSERVER_PRIO
 #define BLE_TES_BLE_OBSERVER_PRIO 2
 #endif
 
 // <o> BLE_TES_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Thingy Enviroment Service Client.
+// <i> Priority with which BLE events are dispatched to the Thingy Environment Service Client.
 
 #ifndef BLE_TES_C_BLE_OBSERVER_PRIO
 #define BLE_TES_C_BLE_OBSERVER_PRIO 2

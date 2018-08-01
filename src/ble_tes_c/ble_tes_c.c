@@ -124,7 +124,7 @@ static void tx_buffer_process(void)
 
 /**@brief Function for handling write response events.
  *
- * @param[in] p_ble_tes_c Pointer to the Thingy Enviroment Client structure.
+ * @param[in] p_ble_tes_c Pointer to the Thingy Environment Client structure.
  * @param[in] p_ble_evt   Pointer to the BLE event received.
  */
 static void on_write_rsp(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_evt)
@@ -143,10 +143,10 @@ static void on_write_rsp(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_evt)
  *
  * @details This function will uses the Handle Value Notification received from the SoftDevice
  *          and checks if it is a notification of Button state from the peer. If
- *          it is, this function will decode the state of the button and send it to the
+ *          it is, this function will decode value of the sensor and send it to the
  *          application.
  *
- * @param[in] p_ble_tes_c Pointer to the Thingy Enviroment Client structure.
+ * @param[in] p_ble_tes_c Pointer to the Thingy Environment Client structure.
  * @param[in] p_ble_evt   Pointer to the BLE event received.
  */
 static void on_hvx(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_evt)
@@ -197,7 +197,7 @@ static void on_hvx(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_evt)
  *          associated with the current instance of the module, if so it will set its
  *          conn_handle to invalid.
  *
- * @param[in] p_ble_tes_c Pointer to the Thingy Enviroment Client structure.
+ * @param[in] p_ble_tes_c Pointer to the Thingy Environment Client structure.
  * @param[in] p_ble_evt   Pointer to the BLE event received.
  */
 static void on_disconnected(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_evt)
@@ -223,7 +223,7 @@ static void on_disconnected(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_e
 
 void ble_tes_on_db_disc_evt(ble_tes_c_t * p_ble_tes_c, ble_db_discovery_evt_t const * p_evt)
 {
-    // Check if the Thingy Enviroment Service was discovered.
+    // Check if the Thingy Environment Service was discovered.
     if (p_evt->evt_type == BLE_DB_DISCOVERY_COMPLETE &&
         p_evt->params.discovered_db.srv_uuid.uuid == BLE_UUID_TES_SERVICE &&
         p_evt->params.discovered_db.srv_uuid.type == p_ble_tes_c->uuid_type)
@@ -267,7 +267,7 @@ void ble_tes_on_db_disc_evt(ble_tes_c_t * p_ble_tes_c, ble_db_discovery_evt_t co
             }
         }
 
-        NRF_LOG_DEBUG("Thingy Enviroment Service discovered at peer.");
+        NRF_LOG_DEBUG("Thingy Environment Service discovered at peer.");
         //If the instance has been assigned prior to db_discovery, assign the db_handles
         if (p_ble_tes_c->conn_handle != BLE_CONN_HANDLE_INVALID)
         {
@@ -479,36 +479,6 @@ uint32_t ble_tes_c_config_notif_enable(ble_tes_c_t * p_ble_tes_c)
                           p_ble_tes_c->peer_tes_db.config_cccd_handle,
                           true);
 }
-
-
-/* uint32_t ble_tes_led_status_send(ble_tes_c_t * p_ble_tes_c, uint8_t status)
-{
-    VERIFY_PARAM_NOT_NULL(p_ble_tes_c);
-
-    if (p_ble_tes_c->conn_handle == BLE_CONN_HANDLE_INVALID)
-    {
-        return NRF_ERROR_INVALID_STATE;
-    }
-
-    NRF_LOG_DEBUG("writing LED status 0x%x", status);
-
-    tx_message_t * p_msg;
-
-    p_msg              = &m_tx_buffer[m_tx_insert_index++];
-    m_tx_insert_index &= TX_BUFFER_MASK;
-
-    p_msg->req.write_req.gattc_params.handle   = p_ble_tes_c->peer_tes_db.led_handle;
-    p_msg->req.write_req.gattc_params.len      = sizeof(status);
-    p_msg->req.write_req.gattc_params.p_value  = p_msg->req.write_req.gattc_value;
-    p_msg->req.write_req.gattc_params.offset   = 0;
-    p_msg->req.write_req.gattc_params.write_op = BLE_GATT_OP_WRITE_CMD;
-    p_msg->req.write_req.gattc_value[0]        = status;
-    p_msg->conn_handle                         = p_ble_tes_c->conn_handle;
-    p_msg->type                                = WRITE_REQ;
-
-    tx_buffer_process();
-    return NRF_SUCCESS;
-} */
 
 uint32_t ble_tes_c_handles_assign(ble_tes_c_t    * p_ble_tes_c,
                                   uint16_t         conn_handle,
