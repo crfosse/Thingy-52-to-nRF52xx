@@ -37,7 +37,7 @@ Note 1: It is possible to get config data from the Thingy, but I haven't looked 
 
 Note 2: CO2 data from the Thingy is as of now not working. But I'm trying to find out how to get it. 
 
-Note 3: The neccessary defines to add in the `sdk_config` are: 
+Note 3: The necessary defines to add in the `sdk_config` are: 
 ```
 // <q> BLE_TES_C_ENABLED  - ble_tes_c - Nordic Thingy Enviroment Service Client
 
