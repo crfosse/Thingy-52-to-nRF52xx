@@ -376,6 +376,13 @@
 #define BLE_TES_C_ENABLED 1
 #endif
 
+// <q> BLE_TBS_C_ENABLED  - ble_tes_c - Nordic Thingy Button Service Client
+ 
+
+#ifndef BLE_TBS_C_ENABLED
+#define BLE_TBS_C_ENABLED 1
+#endif
+
 // <q> BLE_LBS_ENABLED  - ble_lbs - LED Button Service
  
 
@@ -11647,6 +11654,13 @@
 
 #ifndef BLE_TES_C_BLE_OBSERVER_PRIO
 #define BLE_TES_C_BLE_OBSERVER_PRIO 2
+#endif
+
+// <o> BLE_TBS_C_BLE_OBSERVER_PRIO  
+// <i> Priority with which BLE events are dispatched to the Thingy Button Service Client.
+
+#ifndef BLE_TBS_C_BLE_OBSERVER_PRIO
+#define BLE_TBS_C_BLE_OBSERVER_PRIO 2
 #endif
 
 // <o> BLE_LESC_OBSERVER_PRIO  

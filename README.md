@@ -22,13 +22,16 @@ The code takes base in the `ble_app_blinky_c` example found in the SDK. This use
 #define LBS_UUID_LED_CHAR    0x0301
 ```
 
+
 This should enable your development kit to react on button presses from the Thingy. 
 
-Achieving access to all the environment sensor data from the Thingy requires more work(and I have done it for you). In short I have taken the BLE LED button service code and rewritten it for handling Environment data from the Thingy. I have called this: Thingy Environment Service(TES). `main.c` is also ammended to support this. 
+I have made this functionality into its own service called Thingy Button Service(TBS), which is included in the `src` folder.
+
+Achieving access to all the environment sensor data from the Thingy requires more work(and I have done it for you). In short I have taken the BLE LED button service code and rewritten it for handling Environment data from the Thingy. I have called this thr Thingy Environment Service(TES). `main.c` is also ammended to support this. 
 
 In order to try this out yourself:
 1. Add the `ble_app_thingy_to_52_dk_c` project folder to `<Your SDK path>\examples\ble_central\`. This folder contains the `main.c` file and the µvision Keil project(Segger support is on its way). 
-2. Move the folders in src to `<Your SDK path>\components\ble\ble_services\`. The folder `ble_tes_c` includes the Thingy Environment service files and the `ble_lbs_c` folder includes the original LED button service code amended for use with the Thingy(as described earlier). 
+2. Move the folders in src to `<Your SDK path>\components\ble\ble_services\`. The folder `ble_tes_c` includes the Thingy Environment service files and the `ble_tbs_c` folder includes the original LED button service code amended for use with the Thingy(as described earlier). 
 3. Build and flash it to you nrf52 DK. 
 
 Short usage guide:
@@ -51,6 +54,19 @@ Note 3: The necessary defines to add in the `sdk_config` are:
 
 #ifndef BLE_TES_C_BLE_OBSERVER_PRIO
 #define BLE_TES_C_BLE_OBSERVER_PRIO 2
+#endif
+
+// <q> BLE_TBS_C_ENABLED  - ble_tes_c - Nordic Thingy Button Service Client
+
+#ifndef BLE_TBS_C_ENABLED
+#define BLE_TBS_C_ENABLED 1
+#endif
+
+// <o> BLE_TBS_C_BLE_OBSERVER_PRIO  
+// <i> Priority with which BLE events are dispatched to the Thingy Button Service Client.
+
+#ifndef BLE_TBS_C_BLE_OBSERVER_PRIO
+#define BLE_TBS_C_BLE_OBSERVER_PRIO 2
 #endif
 
 ```

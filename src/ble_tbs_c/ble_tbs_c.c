@@ -38,14 +38,14 @@
  * 
  */
 #include "sdk_common.h"
-#if NRF_MODULE_ENABLED(BLE_LBS_C)
+#if NRF_MODULE_ENABLED(BLE_TBS_C)
 
-#include "ble_lbs_c.h"
+#include "ble_tbs_c.h"
 #include "ble_db_discovery.h"
 #include "ble_types.h"
 #include "ble_srv_common.h"
 #include "ble_gattc.h"
-#define NRF_LOG_MODULE_NAME ble_lbs_c
+#define NRF_LOG_MODULE_NAME ble_tbs_c
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
@@ -124,13 +124,13 @@ static void tx_buffer_process(void)
 
 /**@brief Function for handling write response events.
  *
- * @param[in] p_ble_lbs_c Pointer to the Led Button Client structure.
+ * @param[in] p_ble_tbs_c Pointer to the Thingy Button Client structure.
  * @param[in] p_ble_evt   Pointer to the BLE event received.
  */
-static void on_write_rsp(ble_lbs_c_t * p_ble_lbs_c, ble_evt_t const * p_ble_evt)
+static void on_write_rsp(ble_tbs_c_t * p_ble_tbs_c, ble_evt_t const * p_ble_evt)
 {
     // Check if the event if on the link for this instance
-    if (p_ble_lbs_c->conn_handle != p_ble_evt->evt.gattc_evt.conn_handle)
+    if (p_ble_tbs_c->conn_handle != p_ble_evt->evt.gattc_evt.conn_handle)
     {
         return;
     }
@@ -146,27 +146,27 @@ static void on_write_rsp(ble_lbs_c_t * p_ble_lbs_c, ble_evt_t const * p_ble_evt)
  *          it is, this function will decode the state of the button and send it to the
  *          application.
  *
- * @param[in] p_ble_lbs_c Pointer to the Led Button Client structure.
+ * @param[in] p_ble_tbs_c Pointer to the Thingy Button Client structure.
  * @param[in] p_ble_evt   Pointer to the BLE event received.
  */
-static void on_hvx(ble_lbs_c_t * p_ble_lbs_c, ble_evt_t const * p_ble_evt)
+static void on_hvx(ble_tbs_c_t * p_ble_tbs_c, ble_evt_t const * p_ble_evt)
 {
     // Check if the event is on the link for this instance
-    if (p_ble_lbs_c->conn_handle != p_ble_evt->evt.gattc_evt.conn_handle)
+    if (p_ble_tbs_c->conn_handle != p_ble_evt->evt.gattc_evt.conn_handle)
     {
         return;
     }
     // Check if this is a Button notification.
-    if (p_ble_evt->evt.gattc_evt.params.hvx.handle == p_ble_lbs_c->peer_lbs_db.button_handle)
+    if (p_ble_evt->evt.gattc_evt.params.hvx.handle == p_ble_tbs_c->peer_tbs_db.button_handle)
     {
         if (p_ble_evt->evt.gattc_evt.params.hvx.len == 1)
         {
-            ble_lbs_c_evt_t ble_lbs_c_evt;
+            ble_tbs_c_evt_t ble_tbs_c_evt;
 
-            ble_lbs_c_evt.evt_type                   = BLE_LBS_C_EVT_BUTTON_NOTIFICATION;
-            ble_lbs_c_evt.conn_handle                = p_ble_lbs_c->conn_handle;
-            ble_lbs_c_evt.params.button.button_state = p_ble_evt->evt.gattc_evt.params.hvx.data[0];
-            p_ble_lbs_c->evt_handler(p_ble_lbs_c, &ble_lbs_c_evt);
+            ble_tbs_c_evt.evt_type                   = BLE_TBS_C_EVT_BUTTON_NOTIFICATION;
+            ble_tbs_c_evt.conn_handle                = p_ble_tbs_c->conn_handle;
+            ble_tbs_c_evt.params.button.button_state = p_ble_evt->evt.gattc_evt.params.hvx.data[0];
+            p_ble_tbs_c->evt_handler(p_ble_tbs_c, &ble_tbs_c_evt);
         }
     }
 }
@@ -178,31 +178,30 @@ static void on_hvx(ble_lbs_c_t * p_ble_lbs_c, ble_evt_t const * p_ble_evt)
  *          associated with the current instance of the module, if so it will set its
  *          conn_handle to invalid.
  *
- * @param[in] p_ble_lbs_c Pointer to the Led Button Client structure.
+ * @param[in] p_ble_tbs_c Pointer to the Thingy Button Client structure.
  * @param[in] p_ble_evt   Pointer to the BLE event received.
  */
-static void on_disconnected(ble_lbs_c_t * p_ble_lbs_c, ble_evt_t const * p_ble_evt)
+static void on_disconnected(ble_tbs_c_t * p_ble_tbs_c, ble_evt_t const * p_ble_evt)
 {
-    if (p_ble_lbs_c->conn_handle == p_ble_evt->evt.gap_evt.conn_handle)
+    if (p_ble_tbs_c->conn_handle == p_ble_evt->evt.gap_evt.conn_handle)
     {
-        p_ble_lbs_c->conn_handle                    = BLE_CONN_HANDLE_INVALID;
-        p_ble_lbs_c->peer_lbs_db.button_cccd_handle = BLE_GATT_HANDLE_INVALID;
-        p_ble_lbs_c->peer_lbs_db.button_handle      = BLE_GATT_HANDLE_INVALID;
-        p_ble_lbs_c->peer_lbs_db.led_handle         = BLE_GATT_HANDLE_INVALID;
+        p_ble_tbs_c->conn_handle                    = BLE_CONN_HANDLE_INVALID;
+        p_ble_tbs_c->peer_tbs_db.button_cccd_handle = BLE_GATT_HANDLE_INVALID;
+        p_ble_tbs_c->peer_tbs_db.button_handle      = BLE_GATT_HANDLE_INVALID;
     }
 }
 
 
-void ble_lbs_on_db_disc_evt(ble_lbs_c_t * p_ble_lbs_c, ble_db_discovery_evt_t const * p_evt)
+void ble_tbs_on_db_disc_evt(ble_tbs_c_t * p_ble_tbs_c, ble_db_discovery_evt_t const * p_evt)
 {
-    // Check if the Led Button Service was discovered.
+    // Check if the Thingy Button Service was discovered.
     if (p_evt->evt_type == BLE_DB_DISCOVERY_COMPLETE &&
-        p_evt->params.discovered_db.srv_uuid.uuid == LBS_UUID_SERVICE &&
-        p_evt->params.discovered_db.srv_uuid.type == p_ble_lbs_c->uuid_type)
+        p_evt->params.discovered_db.srv_uuid.uuid == TBS_UUID_SERVICE &&
+        p_evt->params.discovered_db.srv_uuid.type == p_ble_tbs_c->uuid_type)
     {
-        ble_lbs_c_evt_t evt;
+        ble_tbs_c_evt_t evt;
 
-        evt.evt_type    = BLE_LBS_C_EVT_DISCOVERY_COMPLETE;
+        evt.evt_type    = BLE_TBS_C_EVT_DISCOVERY_COMPLETE;
         evt.conn_handle = p_evt->conn_handle;
 
         for (uint32_t i = 0; i < p_evt->params.discovered_db.char_count; i++)
@@ -210,10 +209,7 @@ void ble_lbs_on_db_disc_evt(ble_lbs_c_t * p_ble_lbs_c, ble_db_discovery_evt_t co
             const ble_gatt_db_char_t * p_char = &(p_evt->params.discovered_db.charateristics[i]);
             switch (p_char->characteristic.uuid.uuid)
             {
-                case LBS_UUID_LED_CHAR:
-                    evt.params.peer_db.led_handle = p_char->characteristic.handle_value;
-                    break;
-                case LBS_UUID_BUTTON_CHAR:
+                case TBS_UUID_BUTTON_CHAR:
                     evt.params.peer_db.button_handle      = p_char->characteristic.handle_value;
                     evt.params.peer_db.button_cccd_handle = p_char->cccd_handle;
                     break;
@@ -223,74 +219,72 @@ void ble_lbs_on_db_disc_evt(ble_lbs_c_t * p_ble_lbs_c, ble_db_discovery_evt_t co
             }
         }
 
-        NRF_LOG_DEBUG("Led Button Service discovered at peer.");
+        NRF_LOG_DEBUG("Thingy Button Service discovered at peer.");
         //If the instance has been assigned prior to db_discovery, assign the db_handles
-        if (p_ble_lbs_c->conn_handle != BLE_CONN_HANDLE_INVALID)
+        if (p_ble_tbs_c->conn_handle != BLE_CONN_HANDLE_INVALID)
         {
-            if ((p_ble_lbs_c->peer_lbs_db.led_handle         == BLE_GATT_HANDLE_INVALID)&&
-                (p_ble_lbs_c->peer_lbs_db.button_handle      == BLE_GATT_HANDLE_INVALID)&&
-                (p_ble_lbs_c->peer_lbs_db.button_cccd_handle == BLE_GATT_HANDLE_INVALID))
+            if ((p_ble_tbs_c->peer_tbs_db.button_handle      == BLE_GATT_HANDLE_INVALID)&&
+                (p_ble_tbs_c->peer_tbs_db.button_cccd_handle == BLE_GATT_HANDLE_INVALID))
             {
-                p_ble_lbs_c->peer_lbs_db = evt.params.peer_db;
+                p_ble_tbs_c->peer_tbs_db = evt.params.peer_db;
             }
         }
 
-        p_ble_lbs_c->evt_handler(p_ble_lbs_c, &evt);
+        p_ble_tbs_c->evt_handler(p_ble_tbs_c, &evt);
 
     }
 }
 
 
-uint32_t ble_lbs_c_init(ble_lbs_c_t * p_ble_lbs_c, ble_lbs_c_init_t * p_ble_lbs_c_init)
+uint32_t ble_tbs_c_init(ble_tbs_c_t * p_ble_tbs_c, ble_tbs_c_init_t * p_ble_tbs_c_init)
 {
     uint32_t      err_code;
-    ble_uuid_t    lbs_uuid;
-    ble_uuid128_t lbs_base_uuid = {LBS_UUID_BASE};
+    ble_uuid_t    tbs_uuid;
+    ble_uuid128_t tbs_base_uuid = {TBS_UUID_BASE};
 
-    VERIFY_PARAM_NOT_NULL(p_ble_lbs_c);
-    VERIFY_PARAM_NOT_NULL(p_ble_lbs_c_init);
-    VERIFY_PARAM_NOT_NULL(p_ble_lbs_c_init->evt_handler);
+    VERIFY_PARAM_NOT_NULL(p_ble_tbs_c);
+    VERIFY_PARAM_NOT_NULL(p_ble_tbs_c_init);
+    VERIFY_PARAM_NOT_NULL(p_ble_tbs_c_init->evt_handler);
 
-    p_ble_lbs_c->peer_lbs_db.button_cccd_handle = BLE_GATT_HANDLE_INVALID;
-    p_ble_lbs_c->peer_lbs_db.button_handle      = BLE_GATT_HANDLE_INVALID;
-    p_ble_lbs_c->peer_lbs_db.led_handle         = BLE_GATT_HANDLE_INVALID;
-    p_ble_lbs_c->conn_handle                    = BLE_CONN_HANDLE_INVALID;
-    p_ble_lbs_c->evt_handler                    = p_ble_lbs_c_init->evt_handler;
+    p_ble_tbs_c->peer_tbs_db.button_cccd_handle = BLE_GATT_HANDLE_INVALID;
+    p_ble_tbs_c->peer_tbs_db.button_handle      = BLE_GATT_HANDLE_INVALID;
+    p_ble_tbs_c->conn_handle                    = BLE_CONN_HANDLE_INVALID;
+    p_ble_tbs_c->evt_handler                    = p_ble_tbs_c_init->evt_handler;
 
-    err_code = sd_ble_uuid_vs_add(&lbs_base_uuid, &p_ble_lbs_c->uuid_type);
+    err_code = sd_ble_uuid_vs_add(&tbs_base_uuid, &p_ble_tbs_c->uuid_type);
     if (err_code != NRF_SUCCESS)
     {
         return err_code;
     }
     VERIFY_SUCCESS(err_code);
 
-    lbs_uuid.type = p_ble_lbs_c->uuid_type;
-    lbs_uuid.uuid = LBS_UUID_SERVICE;
+    tbs_uuid.type = p_ble_tbs_c->uuid_type;
+    tbs_uuid.uuid = TBS_UUID_SERVICE;
 
-    return ble_db_discovery_evt_register(&lbs_uuid);
+    return ble_db_discovery_evt_register(&tbs_uuid);
 }
 
-void ble_lbs_c_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_context)
+void ble_tbs_c_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_context)
 {
     if ((p_context == NULL) || (p_ble_evt == NULL))
     {
         return;
     }
 
-    ble_lbs_c_t * p_ble_lbs_c = (ble_lbs_c_t *)p_context;
+    ble_tbs_c_t * p_ble_tbs_c = (ble_tbs_c_t *)p_context;
 
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GATTC_EVT_HVX:
-            on_hvx(p_ble_lbs_c, p_ble_evt);
+            on_hvx(p_ble_tbs_c, p_ble_evt);
             break;
 
         case BLE_GATTC_EVT_WRITE_RSP:
-            on_write_rsp(p_ble_lbs_c, p_ble_evt);
+            on_write_rsp(p_ble_tbs_c, p_ble_evt);
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
-            on_disconnected(p_ble_lbs_c, p_ble_evt);
+            on_disconnected(p_ble_tbs_c, p_ble_evt);
             break;
 
         default:
@@ -333,62 +327,32 @@ static uint32_t cccd_configure(uint16_t conn_handle, uint16_t handle_cccd, bool 
 }
 
 
-uint32_t ble_lbs_c_button_notif_enable(ble_lbs_c_t * p_ble_lbs_c)
+uint32_t ble_tbs_c_button_notif_enable(ble_tbs_c_t * p_ble_tbs_c)
 {
-    VERIFY_PARAM_NOT_NULL(p_ble_lbs_c);
+    VERIFY_PARAM_NOT_NULL(p_ble_tbs_c);
 
-    if (p_ble_lbs_c->conn_handle == BLE_CONN_HANDLE_INVALID)
+    if (p_ble_tbs_c->conn_handle == BLE_CONN_HANDLE_INVALID)
     {
         return NRF_ERROR_INVALID_STATE;
     }
 
-    return cccd_configure(p_ble_lbs_c->conn_handle,
-                          p_ble_lbs_c->peer_lbs_db.button_cccd_handle,
+    return cccd_configure(p_ble_tbs_c->conn_handle,
+                          p_ble_tbs_c->peer_tbs_db.button_cccd_handle,
                           true);
 }
 
-
-uint32_t ble_lbs_led_status_send(ble_lbs_c_t * p_ble_lbs_c, uint8_t status)
-{
-    VERIFY_PARAM_NOT_NULL(p_ble_lbs_c);
-
-    if (p_ble_lbs_c->conn_handle == BLE_CONN_HANDLE_INVALID)
-    {
-        return NRF_ERROR_INVALID_STATE;
-    }
-
-    NRF_LOG_DEBUG("writing LED status 0x%x", status);
-
-    tx_message_t * p_msg;
-
-    p_msg              = &m_tx_buffer[m_tx_insert_index++];
-    m_tx_insert_index &= TX_BUFFER_MASK;
-
-    p_msg->req.write_req.gattc_params.handle   = p_ble_lbs_c->peer_lbs_db.led_handle;
-    p_msg->req.write_req.gattc_params.len      = sizeof(status);
-    p_msg->req.write_req.gattc_params.p_value  = p_msg->req.write_req.gattc_value;
-    p_msg->req.write_req.gattc_params.offset   = 0;
-    p_msg->req.write_req.gattc_params.write_op = BLE_GATT_OP_WRITE_CMD;
-    p_msg->req.write_req.gattc_value[0]        = status;
-    p_msg->conn_handle                         = p_ble_lbs_c->conn_handle;
-    p_msg->type                                = WRITE_REQ;
-
-    tx_buffer_process();
-    return NRF_SUCCESS;
-}
-
-uint32_t ble_lbs_c_handles_assign(ble_lbs_c_t    * p_ble_lbs_c,
+uint32_t ble_tbs_c_handles_assign(ble_tbs_c_t    * p_ble_tbs_c,
                                   uint16_t         conn_handle,
-                                  const lbs_db_t * p_peer_handles)
+                                  const tbs_db_t * p_peer_handles)
 {
-    VERIFY_PARAM_NOT_NULL(p_ble_lbs_c);
+    VERIFY_PARAM_NOT_NULL(p_ble_tbs_c);
 
-    p_ble_lbs_c->conn_handle = conn_handle;
+    p_ble_tbs_c->conn_handle = conn_handle;
     if (p_peer_handles != NULL)
     {
-        p_ble_lbs_c->peer_lbs_db = *p_peer_handles;
+        p_ble_tbs_c->peer_tbs_db = *p_peer_handles;
     }
     return NRF_SUCCESS;
 }
 
-#endif // NRF_MODULE_ENABLED(BLE_LBS_C)
+#endif // NRF_MODULE_ENABLED(BLE_TBS_C)

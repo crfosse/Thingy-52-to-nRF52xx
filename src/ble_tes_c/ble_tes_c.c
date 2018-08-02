@@ -124,7 +124,7 @@ static void tx_buffer_process(void)
 
 /**@brief Function for handling write response events.
  *
- * @param[in] p_ble_tes_c Pointer to the Thingy Environment Client structure.
+ * @param[in] p_ble_tes_c Pointer to the Thingy Enviroment Client structure.
  * @param[in] p_ble_evt   Pointer to the BLE event received.
  */
 static void on_write_rsp(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_evt)
@@ -143,10 +143,10 @@ static void on_write_rsp(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_evt)
  *
  * @details This function will uses the Handle Value Notification received from the SoftDevice
  *          and checks if it is a notification of Button state from the peer. If
- *          it is, this function will decode value of the sensor and send it to the
+ *          it is, this function will decode the state of the button and send it to the
  *          application.
  *
- * @param[in] p_ble_tes_c Pointer to the Thingy Environment Client structure.
+ * @param[in] p_ble_tes_c Pointer to the Thingy Enviroment Client structure.
  * @param[in] p_ble_evt   Pointer to the BLE event received.
  */
 static void on_hvx(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_evt)
@@ -160,32 +160,37 @@ static void on_hvx(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_evt)
     ble_tes_c_evt_t ble_tes_c_evt;
 
     ble_tes_c_evt.conn_handle                = p_ble_tes_c->conn_handle;
-    ble_tes_c_evt.params.value.evt_data = p_ble_evt->evt.gattc_evt.params.hvx.data[0];
+    
     
     // Check if this is a Temperature notification.
     if (p_ble_evt->evt.gattc_evt.params.hvx.handle == p_ble_tes_c->peer_tes_db.temperature_handle)
     {
-      ble_tes_c_evt.evt_type                   = BLE_TES_C_EVT_TEMPERATURE_NOTIFICATION;
+        ble_tes_c_evt.evt_type = BLE_TES_C_EVT_TEMPERATURE_NOTIFICATION;
+        ble_tes_c_evt.params.value.temperature_data = *(ble_tes_temperature_t *)p_ble_evt->evt.gattc_evt.params.hvx.data;
     } 
     else if (p_ble_evt->evt.gattc_evt.params.hvx.handle == p_ble_tes_c->peer_tes_db.pressure_handle)
     {
-            ble_tes_c_evt.evt_type                   = BLE_TES_C_EVT_PRESSURE_NOTIFICATION;
+        ble_tes_c_evt.evt_type = BLE_TES_C_EVT_PRESSURE_NOTIFICATION;
+        ble_tes_c_evt.params.value.pressure_data = *(ble_tes_pressure_t *)p_ble_evt->evt.gattc_evt.params.hvx.data;
     }
     else if (p_ble_evt->evt.gattc_evt.params.hvx.handle == p_ble_tes_c->peer_tes_db.humidity_handle)
     {
-        ble_tes_c_evt.evt_type                   = BLE_TES_C_EVT_HUMIDITY_NOTIFICATION;
+        ble_tes_c_evt.evt_type = BLE_TES_C_EVT_HUMIDITY_NOTIFICATION;
+        ble_tes_c_evt.params.value.humidity_data = *(ble_tes_humidity_t *)p_ble_evt->evt.gattc_evt.params.hvx.data;
     }
     else if (p_ble_evt->evt.gattc_evt.params.hvx.handle == p_ble_tes_c->peer_tes_db.gas_handle)
     {
-        ble_tes_c_evt.evt_type                   = BLE_TES_C_EVT_GAS_NOTIFICATION;
+        ble_tes_c_evt.evt_type = BLE_TES_C_EVT_GAS_NOTIFICATION;
+        ble_tes_c_evt.params.value.gas_data = *(ble_tes_gas_t *)p_ble_evt->evt.gattc_evt.params.hvx.data;
     }
     else if (p_ble_evt->evt.gattc_evt.params.hvx.handle == p_ble_tes_c->peer_tes_db.color_handle)
     {
-        ble_tes_c_evt.evt_type                   = BLE_TES_C_EVT_COLOR_NOTIFICATION;
+        ble_tes_c_evt.evt_type = BLE_TES_C_EVT_COLOR_NOTIFICATION;
+        ble_tes_c_evt.params.value.color_data = *(ble_tes_color_t *)p_ble_evt->evt.gattc_evt.params.hvx.data;
     }
     else if (p_ble_evt->evt.gattc_evt.params.hvx.handle == p_ble_tes_c->peer_tes_db.config_handle)
     {
-        ble_tes_c_evt.evt_type                   = BLE_TES_C_EVT_CONFIG_NOTIFICATION;
+        ble_tes_c_evt.evt_type = BLE_TES_C_EVT_CONFIG_NOTIFICATION;
     } else return;
     p_ble_tes_c->evt_handler(p_ble_tes_c, &ble_tes_c_evt);
 }
@@ -197,7 +202,7 @@ static void on_hvx(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_evt)
  *          associated with the current instance of the module, if so it will set its
  *          conn_handle to invalid.
  *
- * @param[in] p_ble_tes_c Pointer to the Thingy Environment Client structure.
+ * @param[in] p_ble_tes_c Pointer to the Thingy Enviroment Client structure.
  * @param[in] p_ble_evt   Pointer to the BLE event received.
  */
 static void on_disconnected(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_evt)
@@ -223,7 +228,7 @@ static void on_disconnected(ble_tes_c_t * p_ble_tes_c, ble_evt_t const * p_ble_e
 
 void ble_tes_on_db_disc_evt(ble_tes_c_t * p_ble_tes_c, ble_db_discovery_evt_t const * p_evt)
 {
-    // Check if the Thingy Environment Service was discovered.
+    // Check if the Thingy Enviroment Service was discovered.
     if (p_evt->evt_type == BLE_DB_DISCOVERY_COMPLETE &&
         p_evt->params.discovered_db.srv_uuid.uuid == BLE_UUID_TES_SERVICE &&
         p_evt->params.discovered_db.srv_uuid.type == p_ble_tes_c->uuid_type)
@@ -267,7 +272,7 @@ void ble_tes_on_db_disc_evt(ble_tes_c_t * p_ble_tes_c, ble_db_discovery_evt_t co
             }
         }
 
-        NRF_LOG_DEBUG("Thingy Environment Service discovered at peer.");
+        NRF_LOG_DEBUG("Thingy Enviroment Service discovered at peer.");
         //If the instance has been assigned prior to db_discovery, assign the db_handles
         if (p_ble_tes_c->conn_handle != BLE_CONN_HANDLE_INVALID)
         {

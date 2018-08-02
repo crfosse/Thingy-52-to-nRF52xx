@@ -40,7 +40,7 @@
 /**
  * @brief Environment sensor data and button press from Thingy:52 to nRf52xx DK application main file.
  *
- * This file contains the source code for a sample client application using the LED Button service and the Thingy Environment service.
+ * This file contains the source code for a sample client application using the Thingy Button service and the Thingy Environment service.
  */
 
 #include <stdint.h>
@@ -60,7 +60,7 @@
 #include "ble_advertising.h"
 #include "ble_conn_params.h"
 #include "ble_db_discovery.h"
-#include "ble_lbs_c.h"
+#include "ble_tbs_c.h"
 #include "ble_tes_c.h"
 #include "nrf_ble_gatt.h"
 
@@ -88,7 +88,7 @@
 #define APP_BLE_CONN_CFG_TAG            1                                   /**< A tag identifying the SoftDevice BLE configuration. */
 #define APP_BLE_OBSERVER_PRIO           3                                   /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 
-BLE_LBS_C_DEF(m_ble_lbs_c);                                     /**< Main structure used by the LBS client module. */
+BLE_TBS_C_DEF(m_ble_tbs_c);                                     /**< Main structure used by the TBS client module. */
 BLE_TES_C_DEF(m_ble_tes_c);                                     /**< Main structure used by the TES client module. */
 NRF_BLE_GATT_DEF(m_gatt);                                       /**< GATT module instance. */
 BLE_DB_DISCOVERY_DEF(m_db_disc);                                /**< DB discovery module instance. */
@@ -169,33 +169,33 @@ static void scan_start(void)
 }
 
 
-/**@brief Handles events coming from the LED Button central module.
+/**@brief Handles events coming from the Thingy Button central module.
  */
-static void lbs_c_evt_handler(ble_lbs_c_t * p_lbs_c, ble_lbs_c_evt_t * p_lbs_c_evt)
+static void tbs_c_evt_handler(ble_tbs_c_t * p_tbs_c, ble_tbs_c_evt_t * p_tbs_c_evt)
 {
-    switch (p_lbs_c_evt->evt_type)
+    switch (p_tbs_c_evt->evt_type)
     {
-        case BLE_LBS_C_EVT_DISCOVERY_COMPLETE:
+        case BLE_TBS_C_EVT_DISCOVERY_COMPLETE:
         {
             ret_code_t err_code;
 
-            err_code = ble_lbs_c_handles_assign(&m_ble_lbs_c,
-                                                p_lbs_c_evt->conn_handle,
-                                                &p_lbs_c_evt->params.peer_db);
-            NRF_LOG_INFO("LED Button service discovered on conn_handle 0x%x.", p_lbs_c_evt->conn_handle);
+            err_code = ble_tbs_c_handles_assign(&m_ble_tbs_c,
+                                                p_tbs_c_evt->conn_handle,
+                                                &p_tbs_c_evt->params.peer_db);
+            NRF_LOG_INFO("Thingy Button service discovered on conn_handle 0x%x.", p_tbs_c_evt->conn_handle);
 
             err_code = app_button_enable();
             APP_ERROR_CHECK(err_code);
 
-            // LED Button service discovered. Enable notification of Button.
-            err_code = ble_lbs_c_button_notif_enable(p_lbs_c);
+            // Thingy Button service discovered. Enable notification of Button.
+            err_code = ble_tbs_c_button_notif_enable(p_tbs_c);
             APP_ERROR_CHECK(err_code);
-        } break; // BLE_LBS_C_EVT_DISCOVERY_COMPLETE
+        } break; // BLE_TBS_C_EVT_DISCOVERY_COMPLETE
 
-        case BLE_LBS_C_EVT_BUTTON_NOTIFICATION:
+        case BLE_TBS_C_EVT_BUTTON_NOTIFICATION:
         {
-            NRF_LOG_INFO("Button state changed on peer to 0x%x.", p_lbs_c_evt->params.button.button_state);
-            if (p_lbs_c_evt->params.button.button_state)
+            NRF_LOG_INFO("Button state changed on peer to 0x%x.", p_tbs_c_evt->params.button.button_state);
+            if (p_tbs_c_evt->params.button.button_state)
             {
                 bsp_board_led_on(LEDBUTTON_LED);
             }
@@ -203,7 +203,7 @@ static void lbs_c_evt_handler(ble_lbs_c_t * p_lbs_c, ble_lbs_c_evt_t * p_lbs_c_e
             {
                 bsp_board_led_off(LEDBUTTON_LED);
             }
-        } break; // BLE_LBS_C_EVT_BUTTON_NOTIFICATION
+        } break; // BLE_TBS_C_EVT_BUTTON_NOTIFICATION
 
         default:
             // No implementation needed.
@@ -215,6 +215,7 @@ static void lbs_c_evt_handler(ble_lbs_c_t * p_lbs_c, ble_lbs_c_evt_t * p_lbs_c_e
  */
 static void tes_c_evt_handler(ble_tes_c_t * p_tes_c, ble_tes_c_evt_t * p_tes_c_evt)
 {
+    
     switch (p_tes_c_evt->evt_type)
     {
         case BLE_TES_C_EVT_DISCOVERY_COMPLETE:
@@ -244,27 +245,33 @@ static void tes_c_evt_handler(ble_tes_c_t * p_tes_c, ble_tes_c_evt_t * p_tes_c_e
 
         case BLE_TES_C_EVT_TEMPERATURE_NOTIFICATION:
         {
-            NRF_LOG_INFO("Got temperature: %d.", p_tes_c_evt->params.value.evt_data);
+            ble_tes_temperature_t temperature = p_tes_c_evt->params.value.temperature_data;
+            NRF_LOG_INFO("Got temperature: %d,%d", temperature.integer, temperature.decimal);
         } break; // BLE_TES_C_EVT_TEMPERATURE_NOTIFICATION
         case BLE_TES_C_EVT_PRESSURE_NOTIFICATION:
         {
-            NRF_LOG_INFO("Got pressure: %d.", p_tes_c_evt->params.value.evt_data);
+            ble_tes_pressure_t pressure = p_tes_c_evt->params.value.pressure_data;
+            NRF_LOG_INFO("Got pressure: %d,%d", pressure.integer, pressure.decimal);
         } break; // BLE_TES_C_EVT_PRESSURE_NOTIFICATION
         case BLE_TES_C_EVT_HUMIDITY_NOTIFICATION:
         {
-            NRF_LOG_INFO("Got humidity: %d.", p_tes_c_evt->params.value.evt_data);
+            ble_tes_humidity_t humidity = p_tes_c_evt->params.value.humidity_data;
+            NRF_LOG_INFO("Got humidity: %d.", humidity);
         } break; // BLE_TES_C_EVT_HUMIDITY_NOTIFICATION
         case BLE_TES_C_EVT_GAS_NOTIFICATION:
         {
-            NRF_LOG_INFO("Got gas: %d.", p_tes_c_evt->params.value.evt_data);
+            ble_tes_gas_t gas = p_tes_c_evt->params.value.gas_data;
+            NRF_LOG_INFO("Got C02: %d.", gas.eco2_ppm);
+            NRF_LOG_INFO("Got organic components: %d.", gas.tvoc_ppb);
         } break; // BLE_TES_C_EVT_GAS_NOTIFICATION
         case BLE_TES_C_EVT_COLOR_NOTIFICATION:
         {
-            NRF_LOG_INFO("Got color: %d.", p_tes_c_evt->params.value.evt_data);
+            ble_tes_color_t color = p_tes_c_evt->params.value.color_data;
+            NRF_LOG_INFO("Got color. R%d, G%d, B%d, C%d", color.red, color.green, color.blue, color.clear);
         } break; // BLE_TES_C_EVT_COLOR_NOTIFICATION
         case BLE_TES_C_EVT_CONFIG_NOTIFICATION:
         {
-            NRF_LOG_INFO("Got config: %d.", p_tes_c_evt->params.value.evt_data);
+            // No implementation. 
         } break; // BLE_TES_C_EVT_CONFIG_NOTIFICATION
 
         default:
@@ -319,7 +326,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
         case BLE_GAP_EVT_CONNECTED:
         {
             NRF_LOG_INFO("Connected.");
-            err_code = ble_lbs_c_handles_assign(&m_ble_lbs_c, p_gap_evt->conn_handle, NULL);
+            err_code = ble_tbs_c_handles_assign(&m_ble_tbs_c, p_gap_evt->conn_handle, NULL);
             APP_ERROR_CHECK(err_code);
             
             err_code = ble_tes_c_handles_assign(&m_ble_tes_c, p_gap_evt->conn_handle, NULL);
@@ -401,16 +408,16 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
 }
 
 
-/**@brief LED Button client initialization.
+/**@brief Thingy Button client initialization.
  */
-static void lbs_c_init(void)
+static void tbs_c_init(void)
 {
     ret_code_t       err_code;
-    ble_lbs_c_init_t lbs_c_init_obj;
+    ble_tbs_c_init_t tbs_c_init_obj;
 
-    lbs_c_init_obj.evt_handler = lbs_c_evt_handler;
+    tbs_c_init_obj.evt_handler = tbs_c_evt_handler;
 
-    err_code = ble_lbs_c_init(&m_ble_lbs_c, &lbs_c_init_obj);
+    err_code = ble_tbs_c_init(&m_ble_tbs_c, &tbs_c_init_obj);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -463,7 +470,7 @@ static void ble_stack_init(void)
  */
 static void db_disc_handler(ble_db_discovery_evt_t * p_evt)
 {
-    ble_lbs_on_db_disc_evt(&m_ble_lbs_c, p_evt);
+    ble_tbs_on_db_disc_evt(&m_ble_tbs_c, p_evt);
     ble_tes_on_db_disc_evt(&m_ble_tes_c, p_evt);
 }
 
@@ -535,7 +542,7 @@ int main(void)
     ble_stack_init();
     gatt_init();
     db_discovery_init();
-    lbs_c_init();
+    tbs_c_init();
     tes_c_init();
 
     // Start execution.
