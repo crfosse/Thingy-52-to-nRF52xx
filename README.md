@@ -11,7 +11,7 @@ For this example I have used:
 
 Programming of the Thingy is not required at all.
 
-The code takes base in the `ble_app_blinky_c` example found in the SDK. This uses the BLE LED button service to demonstrate how two DKs can toggle each other's LEDs through transmitting button state. The first iteration of this project was to enable our DK's LEDS to be toggled by a Thingy button press. This can be done in two steps:
+The code takes base in the `ble_app_blinky_c` example found in the SDK. This uses the BLE LED button service to demonstrate how two DKs can toggle eachother's LEDs through transmitting button state. The first iteration of this project was to enable our DK's LEDs to be toggled by a Thingy button press. This can be done in two steps:
 
 1. In main: change the `m_target_periph_name[]` to your Thingy's name(i.e. `"Thingy"`).
 2. In ble_lbs_c.h: replace the LBS_UUID values with the corrosponding ones for the Thingy: 
@@ -52,6 +52,6 @@ Note 3: The necessary defines to add in the `sdk_config` are:
 
 ```
 
-Note 4: This is only tested with and nRF52832 DK. Some amendments may be necessary for use with the nRF52840. 
+Note 4: This is only tested with a nRF52832 DK. Some amendments may be necessary for use with the nRF52840. 
 
 Good luck!
