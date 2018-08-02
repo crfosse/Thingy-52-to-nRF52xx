@@ -27,11 +27,9 @@ This should enable your development kit to react on button presses from the Thin
 Achieving access to all the environment sensor data from the Thingy requires more work(and I have done it for you). In short I have taken the BLE LED button service code and rewritten it for handling Environment data from the Thingy. I have called this: Thingy Environment Service(TES). `main.c` is also ammended to support this. 
 
 In order to try this out yourself:
-1. replace the `main.c` file in you ble_app_blinky_c example in with the 'main.c' from this repo. In the function `tes_c_evt_handler` you can choose which sensors you want to receive data from. Just call the respective sensor's `ble_tes_c_<sensor type>_notif_enable` function. 
-2. Move the folders in src to `<Your SDK path>\components\ble\ble_services\`. The folder `ble_tes_c` includes the Thingy Environment service files and the `ble_lbs_c` folder includes the original LED button service code amended for use with the Thingy(as described earlier).
-4. Remember to include the path to the `ble_tes_c` folder in your project. 
-5. Add the new `sdk_config.h` from the `config` folder to your project. Alternatively look at "Note 3". 
-5. Build and flash it to you nrf52 DK. 
+1. Add the `ble_app_thingy_to_52_dk_c` project folder to `<Your SDK path>\examples\ble_central\` In the function `tes_c_evt_handler` you can choose which sensors you want to receive data from. Just call the respective sensor's `ble_tes_c_<sensor type>_notif_enable` function. 
+2. Move the folders in src to `<Your SDK path>\components\ble\ble_services\`. The folder `ble_tes_c` includes the Thingy Environment service files and the `ble_lbs_c` folder includes the original LED button service code amended for use with the Thingy(as described earlier). 
+3. Build and flash it to you nrf52 DK. 
 
 Note 1: It is possible to get config data from the Thingy, but I haven't looked into how that works. Use on your own risk. 
 

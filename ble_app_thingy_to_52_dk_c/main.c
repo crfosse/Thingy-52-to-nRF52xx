@@ -249,23 +249,23 @@ static void tes_c_evt_handler(ble_tes_c_t * p_tes_c, ble_tes_c_evt_t * p_tes_c_e
         case BLE_TES_C_EVT_PRESSURE_NOTIFICATION:
         {
             NRF_LOG_INFO("Got pressure: %d.", p_tes_c_evt->params.value.evt_data);
-        } break; // BLE_TES_C_EVT_TEMPERATURE_NOTIFICATION
+        } break; // BLE_TES_C_EVT_PRESSURE_NOTIFICATION
         case BLE_TES_C_EVT_HUMIDITY_NOTIFICATION:
         {
             NRF_LOG_INFO("Got humidity: %d.", p_tes_c_evt->params.value.evt_data);
-        } break; // BLE_TES_C_EVT_TEMPERATURE_NOTIFICATION
+        } break; // BLE_TES_C_EVT_HUMIDITY_NOTIFICATION
         case BLE_TES_C_EVT_GAS_NOTIFICATION:
         {
             NRF_LOG_INFO("Got gas: %d.", p_tes_c_evt->params.value.evt_data);
-        } break; // BLE_TES_C_EVT_TEMPERATURE_NOTIFICATION
+        } break; // BLE_TES_C_EVT_GAS_NOTIFICATION
         case BLE_TES_C_EVT_COLOR_NOTIFICATION:
         {
             NRF_LOG_INFO("Got color: %d.", p_tes_c_evt->params.value.evt_data);
-        } break; // BLE_TES_C_EVT_TEMPERATURE_NOTIFICATION
+        } break; // BLE_TES_C_EVT_COLOR_NOTIFICATION
         case BLE_TES_C_EVT_CONFIG_NOTIFICATION:
         {
-            NRF_LOG_INFO("Got color: %d.", p_tes_c_evt->params.value.evt_data);
-        } break; // BLE_TES_C_EVT_TEMPERATURE_NOTIFICATION
+            NRF_LOG_INFO("Got config: %d.", p_tes_c_evt->params.value.evt_data);
+        } break; // BLE_TES_C_EVT_CONFIG_NOTIFICATION
 
         default:
             // No implementation needed.
@@ -453,57 +453,6 @@ static void ble_stack_init(void)
     NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL);
 }
 
-
-///**@brief Function for handling events from the button handler module.
-// *
-// * @param[in] pin_no        The pin that the event applies to.
-// * @param[in] button_action The button action (press/release).
-// */
-//static void button_event_handler(uint8_t pin_no, uint8_t button_action)
-//{
-//    ret_code_t err_code;
-
-//    switch (pin_no)
-//    {
-//        case LEDBUTTON_BUTTON_PIN:
-//            err_code = ble_lbs_led_status_send(&m_ble_lbs_c, button_action);
-//            if (err_code != NRF_SUCCESS &&
-//                err_code != BLE_ERROR_INVALID_CONN_HANDLE &&
-//                err_code != NRF_ERROR_INVALID_STATE)
-//            {
-//                APP_ERROR_CHECK(err_code);
-//            }
-//            if (err_code == NRF_SUCCESS)
-//            {
-//                NRF_LOG_INFO("LBS write LED state %d", button_action);
-//            }
-//            break;
-
-//        default:
-//            APP_ERROR_HANDLER(pin_no);
-//            break;
-//    }
-//}
-
-
-///**@brief Function for initializing the button handler module.
-// */
-//static void buttons_init(void)
-//{
-//    ret_code_t err_code;
-
-//    //The array must be static because a pointer to it will be saved in the button handler module.
-//    static app_button_cfg_t buttons[] =
-//    {
-//        {LEDBUTTON_BUTTON_PIN, false, BUTTON_PULL, button_event_handler}
-//    };
-
-//    err_code = app_button_init(buttons, ARRAY_SIZE(buttons),
-//                               BUTTON_DETECTION_DELAY);
-//    APP_ERROR_CHECK(err_code);
-//} 
-
-
 /**@brief Function for handling database discovery events.
  *
  * @details This function is callback function to handle events from the database discovery module.
@@ -582,7 +531,6 @@ int main(void)
     log_init();
     timer_init();
     leds_init();
-    //buttons_init();
     power_management_init();
     ble_stack_init();
     gatt_init();
@@ -591,7 +539,7 @@ int main(void)
     tes_c_init();
 
     // Start execution.
-    NRF_LOG_INFO("Blinky CENTRAL example started.");
+    NRF_LOG_INFO("Thingy:52 to nRF52 DK example started.");
     scan_start();
 
     // Turn on the LED to signal scanning.
