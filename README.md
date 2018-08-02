@@ -32,7 +32,7 @@ In order to try this out yourself:
 3. Build and flash it to you nrf52 DK. 
 
 Short usage guide:
-In `main.c` you'll find the function `tes_c_evt_handler` ehere you can choose which sensors you want to receive data from. Just call the respective sensor's `ble_tes_c_<sensor type>_notif_enable` function. The program then writes the received values over UART to you terminal.  
+In `main.c` you'll find the function `tes_c_evt_handler` where you can choose which sensors you want to receive data from. Just call the respective sensor's `ble_tes_c_<sensor type>_notif_enable` function. The program then writes the received values over UART to you terminal.  
 
 Note 1: It is possible to get config data from the Thingy, but I haven't looked into how that works. Use on your own risk. 
 
